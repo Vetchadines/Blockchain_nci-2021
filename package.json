@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Vetchadines/Blockchain_nci-2021/issues"
   },
-  "homepage": "https://github.com/Vetchadines/Blockchain_nci-2021#readme"
+  "homepage": "https://github.com/Vetchadines/Blockchain_nci-2021#readme",
+  "dependencies": {
+    "web3": "^1.6.1"
+  }
 }

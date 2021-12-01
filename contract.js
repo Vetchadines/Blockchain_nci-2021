@@ -270,11 +270,10 @@ const abi = [
 const address = "0x4bd741aa0162ba5d4dcfe4a2608c99f10680121d"
 const owner = "0x48e907D1a190B95aa9934760EC820a66813e9cE5"
 
+const contract = new web3.eth.Contract(abi, address);
+console.log("connected to our ropsten")
 //run some of the methods in our contract (using javascript)
 
 
-
-
-
-console.log("hello world");
+//console.log("hello world");
 

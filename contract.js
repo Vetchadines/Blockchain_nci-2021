@@ -1,19 +1,26 @@
-// this is a basic randomly contact interaction file
-const Web3 = require("Web3")
+// this is a basic readonly contract interaction file
 
+// this loads the web3 dependency
+const Web3 = require("web3")
 
-//instantiate web3
+// this sets up my .env file
+require('dotenv').config()
 
-const rpcURL = "https://ropsten.infura.io/v3/b0f669f19933420f91796fd7e5959977";
+// let's load our environment variables
+infuraToken = "b0f669f19933420f91796fd7e5959977"
+contractAddress = "0xc208c207b82352c430085f860e0108098c898817"
+ownerAddress = "0x48e907D1a190B95aa9934760EC820a66813e9cE5"
+
+// set up a RPC (remote procedure call) to connect to an ethereum node
+const rpcURL = "https://ropsten.infura.io/v3/" + infuraToken;
+
+// instantiate web3 with this URL
 const web3 = new Web3(rpcURL);
+
+console.log("connected to web3");
 
 //get the ABI (interface) for our contract
 const abi = [
-	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
 	{
 		"anonymous": false,
 		"inputs": [
@@ -65,6 +72,88 @@ const abi = [
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "spender",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "approve",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "transfer",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "sender",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "recipient",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
 		"inputs": [],
 		"name": "_totalSupply",
 		"outputs": [
@@ -99,30 +188,6 @@ const abi = [
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -208,106 +273,57 @@ const abi = [
 		],
 		"stateMutability": "view",
 		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "recipient",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "transfer",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "recipient",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "transferFrom",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	}
 ]
 
-//connect to our contract on ropsten
+// specify our contract address 
+const address = contractAddress;
 
-//get our contract address
-const address = "0x4bd741aa0162ba5d4dcfe4a2608c99f10680121d";
-const owner = "0x48e907D1a190B95aa9934760EC820a66813e9cE5";
-
+// instantiate a contract object
 const contract = new web3.eth.Contract(abi, address);
-console.log("connected to our ropsten");
 
-//run some of the methods in our contract (using javascript)
+console.log("connected to contract on ropsten");
+
+
+// specify our owner address
+const owner = ownerAddress;
+
+// run some of the methods in our contract (using javascript)
 
 const getTotalSupply = async() => {
-    let totalSupply = await contract.methods.totalSupply().call();
-    return "total supply is : " + totalSupply;
+    let totSupply = await contract.methods.totalSupply().call();
+    return totSupply;
 }
 
-// const getName = async() => {
-//     let name = await contract.methods.name().call;
-//     return name;
-// }
+const getName = async() => {
+    let name = await contract.methods.name().call();
+    return name
+}
 
-const getBalanceOfOwner = async(owner) => {
+const getBalanceOfAccount = async(account) => {
     let bal = await contract.methods.balanceOf(owner).call();
-    return "total balance of owner: " +bal; 
+    return bal;
 }
 
 const getDecimals = async() => {
-    let  decimals = await contract.methods.decimals().call();
-    return "no of decimals is : " + decimals;
+    let decimals = await contract.methods.decimals().call();
+    return decimals;
 }
 
 const getSymbol = async() => {
-    let  symbol = await contract.methods.symbol().call();
-    return "total symbol is : " + symbol;
+    let symbol = await contract.methods.symbol().call();
+    return symbol;
 }
 
-const returnAllVlaues = async() => {
+const returnAllValues = async() => {
     console.log(await getTotalSupply());
     console.log(await getSymbol());
-    console.log(await getBalanceOfOwner(owner));
-	console.log(await getDecimals());
-    //sconsole.log(await getName());
+    console.log(await getName());
+    console.log(await getDecimals());
+    console.log(await getBalanceOfAccount(owner));
 }
 
-returnAllVlaues();
-//console.log("hello world");
+returnAllValues();
+//console.log("hello world?");
 
+module.exports = { getSymbol, getDecimals, getBalanceOfAccount, getName }

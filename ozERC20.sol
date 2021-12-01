@@ -168,7 +168,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
         _name = name_;
         _symbol = symbol_;
 
-        _mint(msg.sender, 10000000000000000);
+        _mint(msg.sender, 10000000000000000000000);
     }
 
     /**

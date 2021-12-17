@@ -164,8 +164,8 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
      * construction.
      */
     constructor(string memory name_, string memory symbol_) {
-        _name = name_;
-        _symbol = symbol_;
+        _name = "DIN6.0";
+        _symbol = "DIN6.0";
         
         _mint(msg.sender, 1000000000000000000000000);
     }

@@ -1,25 +1,17 @@
-// this is a basic readonly contract interaction file
+// web3 ethereum talker dependency
+const Web3 = require('web3')
 
-// this loads the web3 dependency
-const Web3 = require("web3")
+// transaction crafting dependency
+const Tx = require('ethereumjs-tx').Transaction
 
-// this sets up my .env file
 require('dotenv').config()
 
-// let's load our environment variables
 infuraToken = "b0f669f19933420f91796fd7e5959977"
 contractAddress = "0xaa628857f1f8e86a5bcdf616b27cf30f401a9700"
 ownerAddress = "0x48e907D1a190B95aa9934760EC820a66813e9cE5"
+privateKey = Buffer.from("a08ed7c81597ebb617490b3bcb19b518710a0072613186ecc80d9460d52d45eb", 'hex');
 
-// set up a RPC (remote procedure call) to connect to an ethereum node
-const rpcURL = "https://ropsten.infura.io/v3/" + infuraToken;
-
-// instantiate web3 with this URL
-const web3 = new Web3(rpcURL);
-
-console.log("connected to web3");
-
-//get the ABI (interface) for our contract
+// get the ABI (interface) for our contract
 const abi = [
 	{
 		"anonymous": false,
@@ -309,54 +301,54 @@ const abi = [
 	}
 ]
 
-// specify our contract address 
+// instantiate web3 with the infura rpc url
+const web3 = new Web3("https://ropsten.infura.io/v3/" + infuraToken);
+
 const address = contractAddress;
-
-// instantiate a contract object
-const contract = new web3.eth.Contract(abi, address);
-
-console.log("connected to contract on ropsten");
-
-
-// specify our owner address
 const owner = ownerAddress;
 
-// run some of the methods in our contract (using javascript)
+// connect to our contract
+const contract = new web3.eth.Contract(abi, address);
 
-const getTotalSupply = async() => {
-    let totSupply = await contract.methods.totalSupply().call();
-    return totSupply;
+// set up a send transaction method
+const sendTx = async(raw) => {
+    return await web3.eth.sendSignedTransaction(raw);
 }
 
-const getName = async() => {
-    let name = await contract.methods.name().call();
-    return name
+const transferETH = async(toAccount, amount) => {
+
+    // generate a nonce
+    let txCount = await web3.eth.getTransactionCount(owner);
+    console.log("tx count is " + txCount);
+
+    // generate tx data
+    const txObject = {
+        nonce: web3.utils.toHex(txCount),
+        gasLimit: web3.utils.toHex(21000),
+        gasPrice: web3.utils.toHex(web3.utils.toWei('100', 'gwei')),
+        to: toAccount,
+        //data: contract.methods.transfer(toAccount, amount).encodeABI()
+        value: web3.utils.toHex(web3.utils.toWei(amount, 'ether'))
+    }
+
+    // assign a chain id (ropsten: 3)
+    const tx = new Tx(txObject, {chain: 'ropsten', hardfork: 'petersburg'})
+
+    // sign the tx - THIS USES THE SECRET PRIVATE KEY
+    tx.sign(privateKey);
+
+    console.log("signed transaction with super secret private key");
+
+    // serialize the raw tx
+    const serializedTx = tx.serialize();
+    const raw = '0x' + serializedTx.toString('hex');
+
+    console.log('about to send transaction' + raw)
+
+    // broadcast the transaction
+    let txResponse = await sendTx(raw);
+    console.log("transaction hash: " + txResponse.transactionHash)
+    console.log("transaction in block: " + txResponse.blockNumber)
 }
 
-const getBalanceOfAccount = async(account) => {
-    let bal = await contract.methods.balanceOf(owner).call();
-    return bal;
-}
-
-const getDecimals = async() => {
-    let decimals = await contract.methods.decimals().call();
-    return decimals;
-}
-
-const getSymbol = async() => {
-    let symbol = await contract.methods.symbol().call();
-    return symbol;
-}
-
-const returnAllValues = async() => {
-    console.log(await getTotalSupply());
-    console.log(await getSymbol());
-    console.log(await getName());
-    console.log(await getDecimals());
-    console.log(await getBalanceOfAccount(owner));
-}
-
-//returnAllValues();
-//console.log("hello world?");
-
-module.exports = { getSymbol, getDecimals, getBalanceOfAccount, getName }
+transferETH("0x4d60E7f9d4901816981a0E4c6D95F394159C6371", "0.25")
